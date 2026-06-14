@@ -6,8 +6,9 @@ remote LLM — and optionally commit, push, and tag in one step.
 `aic` reads your staged diff, your current branch, and your recent commit
 history, then asks a model to write a commit message that matches your
 project's existing style. It defaults to a **local Ollama** model so nothing
-leaves your machine, and it's built so other providers (OpenAI, Anthropic,
-LM Studio, vLLM, …) can be added without touching the rest of the tool.
+leaves your machine, and also ships with **OpenRouter** for hosted models —
+other providers (OpenAI, Anthropic, LM Studio, vLLM, …) can be added without
+touching the rest of the tool.
 
 ## Features
 
@@ -71,7 +72,7 @@ aic | pbcopy
 | `-p, --push` | commit, then push the current branch (implies `-c`) |
 | `--tag <name>` | create an annotated tag at the new commit and push it (implies `-p`) |
 | `-m, --model <name>` | model to use (overrides config) |
-| `--provider <id>` | provider to use: `ollama` |
+| `--provider <id>` | provider to use: `ollama`, `openrouter` |
 | `-n, --history <N>` | recent commits to read for style (default 20) |
 | `--endpoint <url>` | Ollama endpoint (default `http://localhost:11434`) |
 | `--max-diff <N>` | max bytes of diff sent to the model (default 12000) |
@@ -102,6 +103,10 @@ aic --init
   "extra_instructions": "",
   "ollama": {
     "endpoint": "http://localhost:11434"
+  },
+  "openrouter": {
+    "endpoint": "https://openrouter.ai/api/v1",
+    "api_key": ""
   }
 }
 ```
@@ -112,6 +117,21 @@ ticket from the branch name").
 
 Precedence: command-line flags override the config file, which overrides the
 built-in defaults.
+
+### Using OpenRouter
+
+[OpenRouter](https://openrouter.ai) gives you one API for hosted models from
+many vendors. Set the provider and a model slug, and provide your API key:
+
+```sh
+export OPENROUTER_API_KEY=sk-or-...
+aic --provider openrouter -m anthropic/claude-3.5-sonnet
+```
+
+The API key is read from `openrouter.api_key` in the config file, falling back
+to the `OPENROUTER_API_KEY` environment variable. Prefer the environment
+variable so your key never lands in a config file. To make OpenRouter the
+default, set `"provider": "openrouter"` and a `"model"` in your config.
 
 ## Adding a provider
 

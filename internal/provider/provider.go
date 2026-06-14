@@ -1,7 +1,7 @@
 // Package provider defines the LLM backend abstraction used to generate
-// commit messages. Ollama is the first implementation; additional providers
-// (OpenAI, Anthropic, LM Studio, vLLM, ...) implement the same interface and
-// register themselves through the factory below.
+// commit messages. Ollama and OpenRouter are the bundled implementations;
+// additional providers (OpenAI, Anthropic, LM Studio, vLLM, ...) implement the
+// same interface and register themselves through the factory below.
 package provider
 
 import (
@@ -37,7 +37,9 @@ func New(cfg config.Config) (Provider, error) {
 	switch cfg.Provider {
 	case "", "ollama":
 		return NewOllama(cfg), nil
+	case "openrouter":
+		return NewOpenRouter(cfg), nil
 	default:
-		return nil, fmt.Errorf("unknown provider %q (supported: ollama)", cfg.Provider)
+		return nil, fmt.Errorf("unknown provider %q (supported: ollama, openrouter)", cfg.Provider)
 	}
 }

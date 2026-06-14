@@ -15,6 +15,17 @@ type OllamaConfig struct {
 	Endpoint string `json:"endpoint,omitempty"`
 }
 
+// OpenRouterConfig holds OpenRouter-specific settings. OpenRouter exposes an
+// OpenAI-compatible chat completions API. See https://openrouter.ai/docs
+type OpenRouterConfig struct {
+	// Endpoint is the API base URL. Empty means the default below.
+	Endpoint string `json:"endpoint,omitempty"`
+	// APIKey authenticates requests. If empty, the OPENROUTER_API_KEY
+	// environment variable is used. Prefer the env var over storing the key
+	// in a config file.
+	APIKey string `json:"api_key,omitempty"`
+}
+
 // Config is the full, resolved configuration.
 type Config struct {
 	// Provider selects the backend, e.g. "ollama".
@@ -32,7 +43,8 @@ type Config struct {
 	// project encode its own commit conventions.
 	ExtraInstructions string `json:"extra_instructions,omitempty"`
 
-	Ollama OllamaConfig `json:"ollama,omitempty"`
+	Ollama     OllamaConfig     `json:"ollama,omitempty"`
+	OpenRouter OpenRouterConfig `json:"openrouter,omitempty"`
 }
 
 // Defaults returns the built-in configuration used when nothing else is set.
@@ -44,6 +56,7 @@ func Defaults() Config {
 		MaxDiffBytes: 12000,
 		Language:     "en",
 		Ollama:       OllamaConfig{Endpoint: "http://localhost:11434"},
+		OpenRouter:   OpenRouterConfig{Endpoint: "https://openrouter.ai/api/v1"},
 	}
 }
 

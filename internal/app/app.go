@@ -52,7 +52,7 @@ Flags:
       --tag <name>     create an annotated tag at the new commit and push it
                        (implies -p)
   -m, --model <name>   model to use (overrides config)
-      --provider <id>  provider to use: ollama (default from config)
+      --provider <id>  provider to use: ollama, openrouter (default from config)
   -n, --history <N>    number of recent commits to read for style (default 20)
       --endpoint <url> Ollama endpoint (default http://localhost:11434)
       --max-diff <N>   max bytes of diff sent to the model (default 12000)
