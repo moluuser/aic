@@ -31,11 +31,12 @@ func (in Input) System() string {
 	b.WriteString(`You are an expert software engineer who writes high-quality git commit messages.
 You are given the staged diff, the current branch name, and recent commit messages from this repository.
 
-Write ONE commit message that describes the staged changes.
+Write ONE commit message that describes ONLY the staged diff below.
 
 Rules:
+- Describe the STAGED DIFF, nothing else. The recent commit messages are provided ONLY as a style reference — they describe changes that are ALREADY committed. Never reuse, echo, or summarise them as if they were the current change.
 - Match the style, tense, and formatting conventions of the recent commit messages shown. If they use Conventional Commits (feat:, fix:, chore:, ...), follow that. If they use a different style, mirror it.
-- The first line is a concise summary, ideally under 72 characters, with no trailing period.
+- The first line is a concise summary, ideally under 72 characters, and MUST NOT end with a period or any other trailing punctuation.
 - If the change is non-trivial, add a blank line then a body explaining WHAT changed and WHY, wrapped at ~72 characters. For trivial changes, the summary line alone is fine.
 - Describe only what the diff actually changes. Do not invent changes or reference files that are not in the diff.
 - Do NOT include markdown code fences, backticks around the whole message, quotes, or any commentary, preamble, or explanation.
@@ -96,6 +97,7 @@ var (
 //   - strips <think>...</think> reasoning blocks,
 //   - removes surrounding markdown code fences,
 //   - strips a single layer of wrapping quotes,
+//   - removes a trailing period from the subject line,
 //   - trims leading/trailing whitespace.
 func Clean(raw string) string {
 	s := thinkBlock.ReplaceAllString(raw, "")
@@ -112,5 +114,18 @@ func Clean(raw string) string {
 		}
 	}
 
-	return strings.TrimSpace(s)
+	s = strings.TrimSpace(s)
+	return stripSubjectPeriod(s)
+}
+
+// stripSubjectPeriod removes a trailing period from the subject (first) line,
+// matching git convention. Body lines are left untouched so prose keeps its
+// punctuation. Both the ASCII "." and the full-width Chinese "。" are handled.
+func stripSubjectPeriod(s string) string {
+	subject, body, hasBody := strings.Cut(s, "\n")
+	subject = strings.TrimRight(subject, " \t.。")
+	if hasBody {
+		return subject + "\n" + body
+	}
+	return subject
 }

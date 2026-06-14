@@ -40,6 +40,26 @@ func TestClean(t *testing.T) {
 			"feat: add X\n\nThis adds X because Y.",
 			"feat: add X\n\nThis adds X because Y.",
 		},
+		{
+			"strips trailing period on subject",
+			"fix: handle nil pointer.",
+			"fix: handle nil pointer",
+		},
+		{
+			"strips full-width period on subject",
+			"修复空指针问题。",
+			"修复空指针问题",
+		},
+		{
+			"strips subject period but keeps body periods",
+			"feat: add X.\n\nThis adds X because Y.",
+			"feat: add X\n\nThis adds X because Y.",
+		},
+		{
+			"strips period after trailing space",
+			"chore: bump deps .",
+			"chore: bump deps",
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
